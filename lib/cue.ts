@@ -1,8 +1,6 @@
 /**
  * Main library
  */
-import * as fs from 'fs';
-import * as chardet from 'chardet';
 import { parseCommand } from './command';
 import { CueSheet, Index, Time } from './cuesheet';
 import { ICueSheet, ITime } from "./types";
@@ -25,32 +23,10 @@ const commandMap: { [command: string]: parserFunction; } = {
   TRACK: parseTrack
 };
 
-/**
- * Parse function
- * @param filename Filename path to cue-sheet to be parsed
- * @return CUE-sheet information object
- */
-export function parse(filename: string): ICueSheet {
+
+export function parseString(data: string): ICueSheet {
   const cuesheet = new CueSheet();
-
-  if (!filename) {
-    console.log('no file name specified for parse');
-    return;
-  }
-
-  if (!fs.existsSync(filename)) {
-    throw new Error('file ' + filename + ' does not exist');
-  }
-
-  cuesheet.encoding = chardet.detect(fs.readFileSync(filename));
-  let encoding = cuesheet.encoding;
-
-  if (cuesheet.encoding.startsWith('ISO-8859-')) {
-    encoding = 'binary';
-  }
-
-  const lines = (fs.readFileSync(filename, {encoding, flag: 'r'}) as any)
-    .replace(/\r\n/, '\n').split('\n');
+  const lines = data.replace(/\r\n/, '\n').split('\n');
 
   lines.forEach(line => {
     if (!line.match(/^\s*$/)) {
